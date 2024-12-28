@@ -1,0 +1,44 @@
+services:
+  # db:
+  #   container_name: spa-template-db
+  #   image: postgres:13-alpine
+  #   environment:
+  #     TZ: Asia/Tokyo
+  #     LANG: ja_JP.utf8
+  #     POSTGRES_USER: spa-template-user
+  #     POSTGRES_PASSWORD: spa-template-dbpass
+  #     POSTGRES_INITDB_ARGS: --encoding=UTF-8 --locale=C
+  #     POSTGRES_DB: postgres
+  #   user: postgres
+  #   command: ["-c", "max_connections=500"]
+  #   volumes:
+  #     - ./api/db:/docker-entrypoint-initdb.d
+  #   ports:
+  #     # 開発中にホスト側で実行されるアプリケーションからアクセスできるようにホストにマッピングする。
+  #     - 5432:5432
+  web:
+    container_name: spa-template-web
+    image: spa-template-web:latest
+    command: "npm run dev"
+    environment:
+      TZ: Asia/Tokyo
+      LANG: ja_JP.utf8
+    ports:
+      # 開発中にホスト側で実行されるアプリケーションからアクセスできるようにホストにマッピングする。
+      - 3000:3000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  api:
+    container_name: spa-template-api
+    image: spa-template-api:latest
+    environment:
+      TZ: Asia/Tokyo
+      LANG: ja_JP.utf8
+    command: uvicorn app.main:app --reload --host=0.0.0.0 --port=8880
+    ports:
+      # 開発中にホスト側で実行されるアプリケーションからアクセスできるようにホストにマッピングする。
+      - 8880:8880
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # depends_on:
+    #   - db
